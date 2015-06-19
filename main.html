@@ -1,0 +1,87 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+
+<head>
+    <title> Flubby Bird </title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<style>
+	</style>
+</head>
+
+<body lang="en">
+
+    <canvas id="mycanvas" width="800" height="600"></canvas>
+
+    <script> 
+        var canvas = document.getElementById('mycanvas');
+
+        function drawBird(ctx, ypos) {
+            var bird_shape = [
+                [.1, -.05],
+                [0, -.1],
+                [0, 0],
+            ];
+
+            var xpos = 0.3
+            drawLines(ctx, xpos, ypos, bird_shape);
+            ctx.fillStyle = "#ff0000";
+            ctx.fill();
+        }
+
+        function drawBackground(ctx, shift) {
+            var mountains = [
+                [.1, .2],
+                [.2, .0],
+                [.3, .1],
+                [.4, .0],
+                [.5, .4],
+                [.7, .1],
+                [.8, .3],
+                [.9, .0],
+                [ 1, .2],
+                [ 1, 0],
+                [ 0, 0],
+            ];
+
+            var dx = shift - Math.floor(shift);
+
+            //drawLines(ctx, dx - 1, 0, mountains);
+            //ctx.fillStyle = "#000000";
+            //ctx.fill();
+            drawLines(ctx, dx, 0, mountains);
+            ctx.fillStyle = "#000000";
+            ctx.fill();
+            //drawLines(ctx, dx + 1, 0, mountains);
+            //ctx.fillStyle = "#000000";
+            //ctx.fill();
+        }
+
+        function drawLines(ctx, startx, starty, points) {
+            var x0 = xpix(startx)
+            var y0 = ypix(starty)
+            ctx.moveTo(x0, y0);
+            ctx.beginPath();
+            for (var i = 0; i < points.length; i++) {
+                var x = xpix(startx + points[i][0]);
+                var y = ypix(starty + points[i][1]);
+                //alert("y,x=" + x.toString() + "," + y.toString());
+                ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+        }
+
+        function xpix(xpos) { return xpos * canvas.width; }
+        function ypix(ypos) { return (1-ypos) * canvas.height; }
+
+        if (canvas.getContext) {
+            var context = canvas.getContext("2d");
+            drawBird(context, .5);
+            drawBackground(context, 0);
+        } else {
+            alert("your browser doesn't support html5 canvas");
+        }
+
+    </script>
+
+</body>
+</html>
