@@ -14,21 +14,21 @@
 
     <script> 
         var canvas = document.getElementById('mycanvas');
+        var ctx = canvas.getContext("2d");
 
-        function drawBird(ctx, ypos) {
+        function drawBird() {
             var bird_shape = [
                 [.1, -.05],
                 [0, -.1],
-                [0, 0],
             ];
 
             var xpos = 0.3
-            drawLines(ctx, xpos, ypos, bird_shape);
+            drawPoly(ctx.birdxpos - ctx.xshift, ctx.birdypos, bird_shape);
             ctx.fillStyle = "#ff0000";
             ctx.fill();
         }
 
-        function drawBackground(ctx, shift) {
+        function drawBackground() {
             var mountains = [
                 [.1, .2],
                 [.2, .0],
@@ -40,53 +40,96 @@
                 [.9, .0],
                 [ 1, .2],
                 [ 1, 0],
-                [ 0, 0],
             ];
 
-            var dx = shift - Math.floor(shift);
+            var dx = -1 * (ctx.xshift - Math.floor(ctx.xshift));
 
-            drawLines(ctx, dx - 1, 0, mountains);
-            ctx.fillStyle = "#000000";
+            drawPoly(dx - 1, 0, mountains);
+            ctx.fillStyle = "#DDDDDD";
             ctx.fill();
-            drawLines(ctx, dx, 0, mountains);
-            ctx.fillStyle = "#000000";
+            drawPoly(dx, 0, mountains);
+            ctx.fillStyle = "#DDDDDD";
             ctx.fill();
-            drawLines(ctx, dx + 1, 0, mountains);
-            ctx.fillStyle = "#000000";
+            drawPoly(dx + 1, 0, mountains);
+            ctx.fillStyle = "#DDDDDD";
             ctx.fill();
         }
 
-        function drawLines(ctx, startx, starty, points) {
-            var x0 = xpix(startx)
-            var y0 = ypix(starty)
+        function drawPoly(startx, starty, points) {
+            var x0 = xpix(startx);
+            var y0 = ypix(starty);
             ctx.moveTo(x0, y0);
             ctx.beginPath();
             for (var i = 0; i < points.length; i++) {
-                var x = xpix(startx + points[i][0]);
-                var y = ypix(starty + points[i][1]);
-                //alert("y,x=" + x.toString() + "," + y.toString());
+                var xpos = startx + points[i][0];
+                var ypos = starty + points[i][1];
+                var x = xpix(xpos);
+                var y = ypix(ypos);
                 ctx.lineTo(x, y);
             }
+            ctx.lineTo(x0, y0);
             ctx.closePath();
+        }
+
+        function drawHoops() {
+            var w = 0.06;
+            var h = 1.00;
+            var hoop = [
+                [w, 0],
+                [w * 2.0 / 3.0, -h / 3.0],
+                [w * 2.0 / 3.0, -h * 2.0 / 3.0],
+                [w, -h],
+                [0.00, -h],
+                [w / 3.0, -h * 2.0 / 3.0],
+                [w / 3.0, -h / 3.0]
+            ];
+
+            for (var i = 0; i < ctx.hoops.length; i++) {
+                var coords = ctx.hoops[i];
+                var h = coords[2];
+                var xpos = coords[0] - ctx.xshift;
+                var ypos = coords[1] + h / 2.0;
+
+                var scaled = hoop.slice();
+                for (var j = 0; j < hoop.length; j++) {
+                    scaled[j] = [hoop[j][0], hoop[j][1] * h];
+                }
+
+                //alert("drawing hoop at " + xpos.toString() + "," + ypos.toString());
+                drawPoly(xpos, ypos, scaled);
+                ctx.fillStyle = "#0000AA";
+                ctx.fill();
+            }
         }
 
         function xpix(xpos) { return xpos * canvas.width; }
         function ypix(ypos) { return (1-ypos) * canvas.height; }
 
-        function animate(ctx, shift) {
+        function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawBird(ctx, .5);
-            drawBackground(ctx, shift);
-            var newshift = shift - 0.005
-            setTimeout("animate(canvas.getContext('2d'), " + newshift.toString() + ")", 30);
+            drawBird();
+            drawBackground();
+            drawHoops();
+            ctx.xshift = ctx.xshift + 0.005;
+            ctx.birdxpos = ctx.birdxpos + 0.005;
+            setTimeout("animate()", 30);
         }
 
-        function main(ctx) {
-            animate(ctx, 0.0);
+        function main() {
+            ctx.xshift = 0;
+            ctx.birdxpos = 0.3;
+            ctx.birdypos = 0.5;
+            ctx.hoops = [
+                [1.3, 0.5, 0.5],
+                [2.3, 0.3, 0.3],
+                [3.3, 0.7, 0.3]
+            ];
+
+            animate();
         }
 
         if (canvas.getContext) {
-            main(canvas.getContext("2d"));
+            main();
         } else {
             alert("your browser doesn't support html5 canvas");
         }
