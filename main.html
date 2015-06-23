@@ -106,17 +106,39 @@
         function ypix(ypos) { return (1-ypos) * canvas.height; }
 
         function animate() {
+            var dt = 30.0;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawBird();
             drawBackground();
+            drawBird();
             drawHoops();
             ctx.xshift = ctx.xshift + 0.005;
             ctx.birdxpos = ctx.birdxpos + 0.005;
-            setTimeout("animate()", 30);
+            ctx.birdyvel = ctx.birdyvel + ctx.birdaccel * 1.0 / dt;
+            if (ctx.birdyvel < ctx.birdmaxspeed) {
+                ctx.birdyvel = ctx.birdmaxspeed;
+            }
+            ctx.birdypos = ctx.birdypos + ctx.birdyvel;
+            setTimeout("animate()", dt);
+        }
+
+        function keydown() {
         }
 
         function main() {
+            $(document).keydown(function(ev) {
+                if (!ev) {
+                  ev = window.event;
+                }
+                var space = 32;
+                if (ev.keyCode == space) {
+                    ctx.birdyvel = -1 * ctx.birdmaxspeed;
+                }
+            });
+
             ctx.xshift = 0;
+            ctx.birdaccel = -0.08;
+            ctx.birdmaxspeed = -.03;
+            ctx.birdyvel = 0.0;
             ctx.birdxpos = 0.3;
             ctx.birdypos = 0.5;
             ctx.hoops = [
