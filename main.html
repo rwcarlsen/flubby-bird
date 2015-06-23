@@ -45,15 +45,15 @@
 
             var dx = shift - Math.floor(shift);
 
-            //drawLines(ctx, dx - 1, 0, mountains);
-            //ctx.fillStyle = "#000000";
-            //ctx.fill();
+            drawLines(ctx, dx - 1, 0, mountains);
+            ctx.fillStyle = "#000000";
+            ctx.fill();
             drawLines(ctx, dx, 0, mountains);
             ctx.fillStyle = "#000000";
             ctx.fill();
-            //drawLines(ctx, dx + 1, 0, mountains);
-            //ctx.fillStyle = "#000000";
-            //ctx.fill();
+            drawLines(ctx, dx + 1, 0, mountains);
+            ctx.fillStyle = "#000000";
+            ctx.fill();
         }
 
         function drawLines(ctx, startx, starty, points) {
@@ -73,10 +73,20 @@
         function xpix(xpos) { return xpos * canvas.width; }
         function ypix(ypos) { return (1-ypos) * canvas.height; }
 
+        function animate(ctx, shift) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBird(ctx, .5);
+            drawBackground(ctx, shift);
+            var newshift = shift - 0.005
+            setTimeout("animate(canvas.getContext('2d'), " + newshift.toString() + ")", 30);
+        }
+
+        function main(ctx) {
+            animate(ctx, 0.0);
+        }
+
         if (canvas.getContext) {
-            var context = canvas.getContext("2d");
-            drawBird(context, .5);
-            drawBackground(context, 0);
+            main(canvas.getContext("2d"));
         } else {
             alert("your browser doesn't support html5 canvas");
         }
